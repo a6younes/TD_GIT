@@ -105,3 +105,51 @@ Les informations a stocker sont les suivantes :
 # Exercice 4
 
 Implémentation de nouvelles fonctionnalités, cf [#13](/../../issues/13) ... [#22](/../../issues/22)
+
+# NOTE
+
+Afin de vous faciliter la vie pour "importer" les issues du projet d'origine dans votre projet, vous pouvez utiliser
+le package python `pygithub` (https://github.com/PyGithub/PyGithub). Le code suivant, **une fois adapté** (github access token
+et `full_name` de votre projet), vous permettra de créer lesdites issues.
+
+```python
+from dataclasses import dataclass
+from github import Github
+from time import sleep
+
+
+@dataclass
+class GithubIssue:
+    title: str
+    body: str
+
+
+# Votre depot d'origine
+REPO_ORIGIN = "TECHNOLOG-M1MIAI-2022/TECHNOLOG"
+# Votre depot cible
+REPO_TARGET = ""
+# Votre access token
+TOKEN = ""
+
+g = Github(TOKEN)
+
+repos = g.get_user().get_repos()
+repo_target = next(filter(lambda repo: repo.full_name == REPO_TARGET, repos))
+repo_origin = next(filter(lambda repo: repo.full_name == REPO_ORIGIN, repos))
+issues_taget_title = [issue.title for issue in repo_target.get_issues()]
+
+issues_origin = repo_origin.get_issues()
+issues_origin = sorted(issues_origin, key=lambda issue: issue.number)
+
+# Creation des issues a partir du depot d'origine.
+for issue in issues_origin:
+    # Test si l'issue existe deja (en cas d'erreur lors de la creation d'une issue)
+    if issue.title in issues_taget_title:
+        continue
+    if issue.number > 22:
+        break
+    repo_target.create_issue(issue.title, issue.body)
+    print(f"Issue {issue.title} created.")
+    sleep(0.1)
+```
+
