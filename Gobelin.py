@@ -5,4 +5,4 @@ class Gobelin:
     
     def randomDegat(self):
         self.degat = random.choice(range(3, 5))
-        self.loot = random.choice(range(2, 2.5))
+        self.loot = random.choice(range(2, 2.4))
